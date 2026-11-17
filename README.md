@@ -22,8 +22,12 @@ Bài tập lớn / Đồ án môn học viết bằng Python (Tkinter) và SQLit
 
 ## Cách chạy chương trình
 
-1. Yêu cầu cài đặt sẵn **Python 3.x** (đã có sẵn thư viện `tkinter` và `sqlite3`).
-2. Mở terminal tại thư mục gốc của dự án và chạy lệnh:
+Mở terminal tại thư mục gốc của dự án và chạy lệnh:
+```bash
+git clone https://github.com/NQT2507/Library-managment-program.git
+cd Library-managment-program
+pip install Pillow
+python src/main.py
 
-   ```bash
-   python src/main.py
+## ghi chú
+Cá nhân sử dụng trợ lý AI claude để hỗ trợ rà soát cấu trúc mã nguồn, gợi ý bố cục giao diện Tkinter và chuẩn hóa tài liệu; sinh viên đã tự đọc hiểu, chạy kiểm thử thực tế và chịu trách nhiệm toàn bộ nội dung nộp.
