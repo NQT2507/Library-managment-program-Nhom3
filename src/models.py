@@ -2,7 +2,10 @@ import sqlite3
 import hashlib
 import os
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "library.db")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_DIR = os.path.join(BASE_DIR, "database")
+os.makedirs(DB_DIR, exist_ok=True)
+DB_PATH = os.path.join(DB_DIR, "library.db")
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
