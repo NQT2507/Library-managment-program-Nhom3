@@ -2,15 +2,12 @@ import sqlite3
 import hashlib
 import os
 
-# Đường dẫn an toàn trỏ ra thư mục gốc
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "library.db")
 
 def hash_password(password):
-    """Băm mật khẩu bằng thuật toán SHA-256"""
     return hashlib.sha256(password.encode()).hexdigest()
 
 def init_db():
-    """Khởi tạo CSDL và tạo sẵn tài khoản Admin nếu chưa có"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -28,7 +25,7 @@ def init_db():
         name TEXT UNIQUE NOT NULL
     )''')
 
-    # 3. Bảng Books 
+    # 3. Bảng Books
     cursor.execute('''CREATE TABLE IF NOT EXISTS books (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         isbn TEXT UNIQUE NOT NULL,
@@ -59,17 +56,26 @@ def init_db():
         FOREIGN KEY (reader_id) REFERENCES users (id)
     )''')
 
-    # Tạo tài khoản Thủ thư mặc định (admin / 123456)
+    # Tạo tài khoản mặc định: Thủ thư (admin/123456) & Độc giả (student/123456)
     cursor.execute("SELECT * FROM users WHERE username='admin'")
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
                        ('admin', hash_password('123456'), 'librarian'))
+        
+    cursor.execute("SELECT * FROM users WHERE username='student'")
+    if not cursor.fetchone():
+        cursor.execute("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+                       ('student', hash_password('123456'), 'reader'))
+
+    # Tạo thể loại mẫu nếu chưa có
+    default_cats = ['Công nghệ thông tin', 'Kinh tế', 'Văn học', 'Kỹ năng sống', 'Khoa học']
+    for cat in default_cats:
+        cursor.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (cat,))
     
     conn.commit()
     conn.close()
 
 def verify_login(username, password):
-    """Kiểm tra đăng nhập, trả về role nếu thành công, None nếu thất bại"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT role FROM users WHERE username=? AND password_hash=?", 
@@ -77,3 +83,11 @@ def verify_login(username, password):
     user = cursor.fetchone()
     conn.close()
     return user[0] if user else None
+
+def get_categories():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name FROM categories")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
