@@ -216,5 +216,13 @@ class LibrarianDashboard(ctk.CTkFrame):
         
         self.load_data()
 
-    def logout(self):
-        self.controller.show_login_screen()
+def logout(self):
+        # 1. Tùy chọn: Hiển thị hộp thoại xác nhận đăng xuất
+        response = messagebox.askyesno("Xác nhận", "Bạn có chắc chắn muốn đăng xuất không?")
+        
+        if response:
+            # 2. Xóa giao diện thủ thư hiện tại
+            self.destroy() 
+            
+            # 3. Gọi lại hàm hiển thị màn hình đăng nhập từ controller (main.py)
+            self.controller.show_login_screen()
