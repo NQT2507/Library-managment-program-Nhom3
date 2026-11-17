@@ -13,12 +13,10 @@ class ReaderDashboard(tk.Frame):
         self.categories = models.get_categories()
         self.cat_options = ["Tất cả thể loại"] + [name for _, name in self.categories]
 
-        # Tiêu đề
         lbl_title = tk.Label(self, text="TRA CỨU DANH MỤC SÁCH (ĐỘC GIẢ)", 
                              font=("Arial", 16, "bold"), bg="#f4f6f9", fg="#2c3e50")
         lbl_title.pack(pady=15)
 
-        # --- Thanh Tìm kiếm & Lọc (FR04) ---
         search_frame = tk.Frame(self, bg="#f4f6f9")
         search_frame.pack(fill="x", padx=20, pady=10)
 
@@ -37,7 +35,6 @@ class ReaderDashboard(tk.Frame):
         tk.Button(search_frame, text="Đăng Xuất", bg="#e74c3c", fg="white", font=("Arial", 10, "bold"), width=10, 
                   command=self.logout).pack(side="right", padx=5)
 
-        # --- Bảng Kết quả ---
         columns = ("ID", "ISBN", "Tên sách", "Tác giả", "Thể loại", "Số bản còn sẵn")
         self.tree = ttk.Treeview(self, columns=columns, show="headings", height=16)
 
@@ -61,7 +58,6 @@ class ReaderDashboard(tk.Frame):
         conn = sqlite3.connect(models.DB_PATH)
         cursor = conn.cursor()
         try:
-            # Chỉ hiển thị sách có is_hidden = 0 (FR02)
             query = """
                 SELECT b.id, b.isbn, b.title, b.author, c.name,
                        (SELECT COUNT(*) FROM book_copies WHERE book_id = b.id AND status = 'available')

@@ -10,21 +10,17 @@ class LibrarianDashboard(tk.Frame):
         self.role = role
         self.configure(bg="#f4f6f9")
         
-        # Lấy danh sách thể loại từ DB
         self.categories = models.get_categories()
         self.cat_map = {name: cid for cid, name in self.categories}
-        self.cat_rev_map = {cid: name for cid, name in self.categories}
 
-        # Tiêu đề
         lbl_title = tk.Label(self, text="QUẢN LÝ ĐẦU SÁCH & BẢN SAO (THỦ THƯ)", 
                              font=("Arial", 16, "bold"), bg="#f4f6f9", fg="#2c3e50")
         lbl_title.pack(pady=10)
 
-        # --- Khu vực Nhập liệu (Form) ---
+        # Form nhập liệu
         frame_form = tk.Frame(self, bg="#f4f6f9")
         frame_form.pack(fill="x", padx=20, pady=5)
 
-        # Hàng 1: ISBN & Tên sách
         tk.Label(frame_form, text="ISBN:", bg="#f4f6f9", font=("Arial", 10)).grid(row=0, column=0, padx=5, pady=5, sticky="e")
         self.ent_isbn = tk.Entry(frame_form, width=18, font=("Arial", 10))
         self.ent_isbn.grid(row=0, column=1, padx=5, pady=5)
@@ -33,7 +29,6 @@ class LibrarianDashboard(tk.Frame):
         self.ent_title = tk.Entry(frame_form, width=32, font=("Arial", 10))
         self.ent_title.grid(row=0, column=3, padx=5, pady=5)
 
-        # Hàng 2: Tác giả & Thể loại
         tk.Label(frame_form, text="Tác giả:", bg="#f4f6f9", font=("Arial", 10)).grid(row=1, column=0, padx=5, pady=5, sticky="e")
         self.ent_author = tk.Entry(frame_form, width=18, font=("Arial", 10))
         self.ent_author.grid(row=1, column=1, padx=5, pady=5)
@@ -46,7 +41,7 @@ class LibrarianDashboard(tk.Frame):
 
         self.selected_book_id = None
 
-        # --- Khu vực Nút bấm ---
+        # Khu vực Nút bấm
         frame_btn = tk.Frame(self, bg="#f4f6f9")
         frame_btn.pack(fill="x", padx=20, pady=8)
 
@@ -58,7 +53,7 @@ class LibrarianDashboard(tk.Frame):
         
         tk.Button(frame_btn, text="Đăng Xuất", bg="#e74c3c", fg="white", font=("Arial", 10, "bold"), width=10, command=self.logout).pack(side="right", padx=4)
 
-        # --- Khu vực Bảng Dữ liệu (Treeview) ---
+        # Bảng Dữ liệu
         columns = ("ID", "ISBN", "Tên sách", "Tác giả", "Thể loại", "Khả dụng / Tổng", "Trạng thái")
         self.tree = ttk.Treeview(self, columns=columns, show="headings", height=15)
         
@@ -80,7 +75,6 @@ class LibrarianDashboard(tk.Frame):
         conn = sqlite3.connect(models.DB_PATH)
         cursor = conn.cursor()
         try:
-            # Truy vấn kết hợp đếm số bản sao khả dụng và tổng số bản sao (FR03)
             query = """
                 SELECT b.id, b.isbn, b.title, b.author, c.name, b.is_hidden,
                        (SELECT COUNT(*) FROM book_copies WHERE book_id = b.id AND status = 'available'),
