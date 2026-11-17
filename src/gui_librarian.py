@@ -11,7 +11,6 @@ class LibrarianDashboard(tk.Frame):
         self.role = role
         self.configure(bg="#f4f6f9")
 
-        # --- Thanh Header trên cùng ---
         header_frame = tk.Frame(self, bg="#2c3e50", height=50)
         header_frame.pack(fill="x")
         
@@ -21,7 +20,6 @@ class LibrarianDashboard(tk.Frame):
         tk.Button(header_frame, text="Đăng Xuất", bg="#e74c3c", fg="white", font=("Arial", 10, "bold"), 
                   width=10, command=self.logout).pack(side="right", padx=20, pady=10)
 
-        # --- Khung Tabs (ttk.Notebook) ---
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both", expand=True, padx=15, pady=15)
 
@@ -33,12 +31,10 @@ class LibrarianDashboard(tk.Frame):
         self.notebook.add(self.tab_borrow, text="  2. Lập Phiếu Mượn & Trả Sách  ")
         self.notebook.add(self.tab_overdue, text="  3. Thống Kê Quá Hạn  ")
 
-        # Khởi tạo nội dung từng tab
         self.setup_books_tab()
         self.setup_borrow_tab()
         self.setup_overdue_tab()
 
-        # Tự động làm mới dữ liệu khi chuyển tab
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
 
     def on_tab_changed(self, event):
@@ -51,9 +47,6 @@ class LibrarianDashboard(tk.Frame):
         elif selected_tab == 2:
             self.load_overdue_records()
 
-    # =========================================================================
-    # TAB 1: QUẢN LÝ ĐẦU SÁCH & BẢN SAO (FR02, FR03)
-    # =========================================================================
     def setup_books_tab(self):
         self.categories = models.get_categories()
         self.cat_map = {name: cid for cid, name in self.categories}
@@ -216,9 +209,6 @@ class LibrarianDashboard(tk.Frame):
         self.ent_title.delete(0, 'end')
         self.ent_author.delete(0, 'end')
 
-    # =========================================================================
-    # TAB 2: LẬP PHIẾU MƯỢN & TRẢ SÁCH (FR05 & FR06)
-    # =========================================================================
     def setup_borrow_tab(self):
         form_frame = tk.LabelFrame(self.tab_borrow, text=" Lập Phiếu Mượn Mới (FR05) ", font=("Arial", 10, "bold"), bg="#f4f6f9", fg="#2c3e50")
         form_frame.pack(fill="x", padx=15, pady=10)
@@ -239,7 +229,6 @@ class LibrarianDashboard(tk.Frame):
         tk.Button(form_frame, text="Xác Nhận Mượn", bg="#27ae60", fg="white", font=("Arial", 10, "bold"), width=14,
                   command=self.create_borrow_record).grid(row=0, column=6, padx=12, pady=10)
 
-        # Nút thao tác trả sách
         action_frame = tk.Frame(self.tab_borrow, bg="#f4f6f9")
         action_frame.pack(fill="x", padx=15, pady=5)
         
@@ -247,7 +236,6 @@ class LibrarianDashboard(tk.Frame):
         tk.Button(action_frame, text="Ghi Nhận Trả Sách (FR06)", bg="#2980b9", fg="white", font=("Arial", 10, "bold"), width=22,
                   command=self.return_book).pack(side="right", padx=5)
 
-        # Bảng danh sách phiếu mượn
         columns = ("Mã Phiếu", "Mã Bản Sao", "Độc Giả", "Tên Sách", "Ngày Mượn", "Hạn Trả", "Ngày Trả", "Trạng Thái")
         self.tree_borrow = ttk.Treeview(self.tab_borrow, columns=columns, show="headings", height=14)
         widths = [65, 80, 100, 220, 95, 95, 95, 100]
@@ -267,7 +255,6 @@ class LibrarianDashboard(tk.Frame):
         conn = sqlite3.connect(models.DB_PATH)
         cursor = conn.cursor()
         try:
-            # Lấy danh sách độc giả
             cursor.execute("SELECT id, username FROM users WHERE role='reader'")
             readers = cursor.fetchall()
             self.reader_map = {f"{r[1]} (ID: {r[0]})": r[0] for r in readers}
@@ -275,7 +262,6 @@ class LibrarianDashboard(tk.Frame):
             if readers:
                 self.cb_readers.current(0)
 
-            # Lấy danh sách sách chưa bị ẩn kèm số lượng bản sao khả dụng
             cursor.execute("""
                 SELECT b.id, b.title, 
                        (SELECT COUNT(*) FROM book_copies WHERE book_id = b.id AND status = 'available')
@@ -308,7 +294,6 @@ class LibrarianDashboard(tk.Frame):
         conn = sqlite3.connect(models.DB_PATH)
         cursor = conn.cursor()
         try:
-            # FR05: Kiểm tra bản sao còn sẵn (available)
             cursor.execute("SELECT id FROM book_copies WHERE book_id=? AND status='available' LIMIT 1", (book_id,))
             copy_row = cursor.fetchone()
 
@@ -320,7 +305,6 @@ class LibrarianDashboard(tk.Frame):
             borrow_date = datetime.now().strftime("%Y-%m-%d")
             due_date = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d")
 
-            # Tạo phiếu mượn và khóa bản sao
             cursor.execute("""
                 INSERT INTO borrow_records (copy_id, reader_id, borrow_date, due_date, return_date)
                 VALUES (?, ?, ?, ?, NULL)
@@ -394,9 +378,6 @@ class LibrarianDashboard(tk.Frame):
             finally:
                 conn.close()
 
-    # =========================================================================
-    # TAB 3: DANH SÁCH MƯỢN QUÁ HẠN (FR06)
-    # =========================================================================
     def setup_overdue_tab(self):
         top_frame = tk.Frame(self.tab_overdue, bg="#f4f6f9")
         top_frame.pack(fill="x", padx=15, pady=12)

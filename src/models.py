@@ -14,7 +14,6 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # 1. Bảng Users
     cursor.execute('''CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
@@ -22,13 +21,11 @@ def init_db():
         role TEXT NOT NULL
     )''')
     
-    # 2. Bảng Categories
     cursor.execute('''CREATE TABLE IF NOT EXISTS categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL
     )''')
 
-    # 3. Bảng Books
     cursor.execute('''CREATE TABLE IF NOT EXISTS books (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         isbn TEXT UNIQUE NOT NULL,
@@ -39,7 +36,6 @@ def init_db():
         FOREIGN KEY (category_id) REFERENCES categories (id)
     )''')
     
-    # 4. Bảng Book_Copies
     cursor.execute('''CREATE TABLE IF NOT EXISTS book_copies (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         book_id INTEGER,
@@ -47,7 +43,6 @@ def init_db():
         FOREIGN KEY (book_id) REFERENCES books (id)
     )''')
     
-    # 5. Bảng Borrow_Records
     cursor.execute('''CREATE TABLE IF NOT EXISTS borrow_records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         copy_id INTEGER,
@@ -59,7 +54,6 @@ def init_db():
         FOREIGN KEY (reader_id) REFERENCES users (id)
     )''')
 
-    # Tạo tài khoản mặc định: Thủ thư (admin/123456) & Độc giả (student/123456)
     cursor.execute("SELECT * FROM users WHERE username='admin'")
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
@@ -70,7 +64,6 @@ def init_db():
         cursor.execute("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
                        ('student', hash_password('123456'), 'reader'))
 
-    # Tạo thể loại mẫu nếu chưa có
     default_cats = ['Công nghệ thông tin', 'Kinh tế', 'Văn học', 'Kỹ năng sống', 'Khoa học']
     for cat in default_cats:
         cursor.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (cat,))
