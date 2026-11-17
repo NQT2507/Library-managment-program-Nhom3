@@ -28,6 +28,6 @@ git clone https://github.com/NQT2507/Library-managment-program.git
 cd Library-managment-program
 pip install Pillow
 python src/main.py
-
+```
 ## ghi chú
 Cá nhân sử dụng trợ lý AI claude để hỗ trợ rà soát cấu trúc mã nguồn, gợi ý bố cục giao diện Tkinter và chuẩn hóa tài liệu; sinh viên đã tự đọc hiểu, chạy kiểm thử thực tế và chịu trách nhiệm toàn bộ nội dung nộp.
